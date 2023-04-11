@@ -114,48 +114,30 @@ int getPosicaoInsercaoOrdenada(Lista_aluno * aluno, char RGM[]) {
     return i;
 }
 
-int inserirOrdenada (Lista_aluno * aluno, t_conteudo dado) {
-	int pos;
-	
-    if (isCheia(aluno))
-        return 0;
-
-	if (isVazia(aluno))
-		pos = 0;
-	else
-	    pos = getPosicaoInsercaoOrdenada(aluno, dado.RGM);
-	
-	inserirPos (aluno, pos, dado);	
-
-    return 1;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-//Essa função será desenvolvida depois de terminar a lista encadeada:
-
-void	mostrar(Lista_aluno * aluno){
-	
-	int i;
-	
-	printf("Minha lista de Alunos\n");
-	for(i = 0; i <= aluno->n; i++) {
-		printf("RGM: %s\t", aluno->dados[i].RGM);
-	}
-}
-
-
 int main() {
 	setlocale(LC_ALL,"Portuguese");
 	
+	Lista_aluno lista = criar();
+	
+	// fazer função ExibeLista()
+    printf("Lista de alunos:\n");
+    for (int i = 0; i <= lista.n; i++) {
+        printf("Aluno %d - RGM: %s\n", i+1, lista.dados[i].RGM);
+    }
+
+    char rgm[8];
+    printf("Digite o RGM do aluno a ser removido: ");
+    scanf("%s", rgm);
+
+	// fazer função removeAluno(), que chama removePos caso encontre o aluno para remover
+    int pos = getPosicao(&lista, rgm);
+    if (pos == -1) {
+        printf("Aluno não encontrado\n");
+    } else {
+        removePos(&lista, pos);
+        printf("Aluno removido com sucesso\n");
+    }
+
+    return 0;
 	
 }
