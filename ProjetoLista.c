@@ -5,8 +5,8 @@
 
 #define MAX 60
 
-
 //estruturas:
+
 
 typedef struct elemento{
 	char disciplina[50];
@@ -22,7 +22,7 @@ typedef t_no * cabecalista;
 
 typedef struct conteudo{
 	cabecalista pt_no;
-	char RGM [8];
+	char RGM [9];
 }t_conteudo;
 
 typedef struct aluno{
@@ -106,6 +106,17 @@ int removePos(Lista_aluno * aluno, int pos) {
     (aluno->n)--;
     
     return 1;
+}
+
+int removeAluno(Lista_aluno * aluno,char RGM[]) {
+	int posicao, i;
+	posicao = getPosicao(aluno, RGM);
+
+        if (posicao != -1) {
+            removePos(aluno, posicao);
+            return 1;
+        }
+    return 0;
 }
 
 int getPosicaoInsercaoOrdenada(Lista_aluno * aluno, char RGM[]) {
@@ -282,7 +293,52 @@ void	mostrar(Lista_aluno * aluno){
 }
 
 
+
+void exibirAlunos(Lista_aluno lista) {
+    printf("Lista de alunos:\n");
+    int i;
+    for (i = 0; i <= lista.n; i++) {
+        printf("Aluno %d - RGM: %s\n", i+1, lista.dados[i].RGM);
+    }
+}
+
 int main() {
 	setlocale(LC_ALL,"Portuguese");
+	int i;
+	cabecalista mlista = NULL;
+	
+	t_conteudo sequencial_cont;
+	t_elemento elemento_encad;
+	t_no * mno;
+	Lista_aluno listaAlunos = criar();
+	
+	
+	
+	printf("Digite o RGM: ");
+	scanf("%s",&(sequencial_cont.RGM));
+	inserirOrdenada(&listaAlunos,sequencial_cont);
+	
+	printf("Digite o RGM: ");
+	scanf("%s",&(sequencial_cont.RGM));
+	inserirOrdenada(&listaAlunos,sequencial_cont);
+	
+	printf("O RGM digitado foi: %s \n",sequencial_cont.RGM);
+	
+	mostrar(&listaAlunos);
+	
+	printf("\n\n");
+	
+    exibirAlunos(listaAlunos);
+    
+    printf("Digite o RGM para remover: ");
+    scanf("%s",&(sequencial_cont.RGM));
+    
+    
+    
+    removeAluno(&listaAlunos,sequencial_cont.RGM);
+    exibirAlunos(listaAlunos);
+    
+	return 0;
+    
 	
 }
