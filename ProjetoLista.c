@@ -15,7 +15,7 @@ typedef struct elemento{
 }t_elemento;
 
 typedef struct no{
-	t_elemento dados;
+	t_elemento elementos;
 	struct no *prox;
 }t_no;
 
@@ -51,17 +51,6 @@ int	isCheia (Lista_aluno * aluno) {
 	return (aluno->n == (MAX -1));
 }
 
-int	getQuantidade(Lista_aluno * aluno) {
-	return (aluno->n + 1);
-}
-
-//procura atraves da posição na lista sequencial (possivelmente desnecessário)
-t_conteudo * getAluno(Lista_aluno * aluno, int pos) {
-	if ((pos > aluno->n) || (pos < 0))
-		return NULL;
-		
-	return &(aluno->dados[pos]);
-}
 
 //procura atraves do rgm do aluno na lista sequencial
 int getPosicao(Lista_aluno * aluno, char RGM[]) {
@@ -151,7 +140,7 @@ int inserirOrdenada (Lista_aluno * aluno, t_conteudo dado) {
 
 //funções para lista encadeada:
 
-
+//função secundaria utilizada na função inserirEncad
 t_no * criaNo() {
     t_no * no = (t_no *) malloc(sizeof(t_no));
 
@@ -192,16 +181,7 @@ t_no * getNo(cabecalista l, int pos) {
     return 0; // erro: posicao invalida
 }
 
-//nao ira precisar
-t_elemento * getElemento(cabecalista l, int pos)
-{
-    t_no * no = getNo(l, pos);
-    
-    if (no != NULL)
-        return &(no->dados);
-    else
-        return NULL;
-}
+
 
 int inserirEncad(cabecalista * l, int pos, t_elemento dado) {
     t_no * p, * novo;
@@ -213,7 +193,7 @@ int inserirEncad(cabecalista * l, int pos, t_elemento dado) {
         if (novo == NULL)
             return 0; // erro: memoria insuficiente
             
-        novo->dados = dado;
+        novo->elementos = dado;
         novo->prox = *l;
         
         *l = novo;
@@ -229,43 +209,12 @@ int inserirEncad(cabecalista * l, int pos, t_elemento dado) {
     if (novo == NULL)
         return 0; // erro: memoria insuficiente
         
-    novo->dados = dado;
+    novo->elementos = dado;
     novo->prox = p->prox;
     p->prox = novo;
 
     return 1;
 }
-
-
-int removerEncad(cabecalista * l, int pos) {
-    t_no * anterior,  * aux;
-    
-    if (encadVazia(*l) || pos < 0)
-		return 0; // erro: lista vazia ou posição inválida
-    
-    if (pos == 0) { // remocao da primeira posicao em lista nao vazia
-        aux = *l;
-        *l = aux->prox;
-    } else { // remocao em qualquer posicao
-        anterior = getNo(*l, pos-1);
-        if (anterior == NULL)
-            return 0; // erro: posicao invalida
-            
-        aux = anterior->prox;
-        if (aux == NULL)
-            return 0; // erro: posicao invalida
-            
-        anterior->prox = aux->prox;
-    }
-    free(aux);
-    
-    return 1;
-}
-
-
-
-
-//Essa função será desenvolvida depois de terminar a lista encadeada:
 
 
 
@@ -274,7 +223,7 @@ void mostraListaEncad(cabecalista l)
 	int cnt = 0;
 	//função para mostrar a lista encadeada para servir como referencia para a criação da função de mostrar a lista completa
 	while(l != NULL) {
-		printf("Elemento [%d] tem [%s]\n", ++cnt, l->dados.disciplina);
+		printf("\nDisciplina[%d]: %s\n Nota: %.2f", ++cnt, l->elementos.disciplina,l->elementos.nota);
 		l = l->prox;
 	}
 	
@@ -293,25 +242,34 @@ void	mostrar(Lista_aluno * aluno){
 }
 
 
-
-void exibirAlunos(Lista_aluno lista) {
-    printf("Lista de alunos:\n");
+void exibirAlunos(Lista_aluno * aluno){
     int i;
-    for (i = 0; i <= lista.n; i++) {
-        printf("Aluno %d - RGM: %s\n", i+1, lista.dados[i].RGM);
+    cabecalista no;
+
+    for(i=0; i<=aluno->n; i++){
+        printf("\nAluno %d:\n", i+1);
+        printf("RGM: %s\n", aluno->dados[i].RGM);
+        no = aluno->dados[i].pt_no;
+        mostraListaEncad(no);
+
+        printf("\n");
     }
 }
 
+
 void menu() {
 	system("cls");
-	printf("Digite a opção desejada:\n1- Incluir um novo elemento na lista\n");
+	printf("Digite a opção desejada:\n");
+	printf("0- Encerrar o programa\n");
+	printf("1- Incluir um novo elemento na lista\n");
 	printf("2- Buscar algum elemento já existente da lista"); 
-	printf("\n3- Exibir a lista completa \n4- Remover algum elemento da lista\n0- Encerrar o programa\n");
+	printf("\n3- Exibir a lista completa \n4- Remover algum elemento da lista\n");
+	printf("5- Exibir os créditos\n");
 }
 
 int main() {
 	setlocale(LC_ALL,"Portuguese");
-	int i=0,pos;
+	int i=0,pos,t,retorno;
 	int qtde=0,totalA=0;
 	char op;
 	char buscargm[9];
@@ -331,7 +289,7 @@ int main() {
 		
 		do{
 			op = getch();
-		}while (op!='0' && op!='1' && op!='2' && op!='3' && op!='4');
+		}while (op!='0' && op!='1' && op!='2' && op!='3' && op!='4' && op!='5');
 	
 		if (op=='0') {
 			sair=1;
@@ -346,10 +304,10 @@ int main() {
 			totalA+=qtde;
 				for(;i<totalA;i++) {
 					int cont=0;
+					sequencial_cont.pt_no=NULL;
 					
 					printf("Digite o RGM: ");
 					scanf("%s",&(sequencial_cont.RGM));
-					inserirOrdenada(&listaAlunos,sequencial_cont);
 					do{
 						fflush(stdin);
 						printf("Disciplina:");
@@ -357,8 +315,7 @@ int main() {
 						printf("Nota:");
 						scanf("%f",&elemento_encad.nota);
 				
-						//inserirPos (&myLista, pos, cont);
-						inserirEncad(&listaAlunos.dados[i].pt_no,cont,elemento_encad);
+						inserirEncad(&sequencial_cont.pt_no,cont,elemento_encad);
 						cont++;
 						
 						fflush(stdin);
@@ -366,6 +323,7 @@ int main() {
 						resp = getchar();
 						fflush(stdin);
 					}while(resp == 's'); 
+					inserirOrdenada(&listaAlunos,sequencial_cont);
 				}
 			getch();
 		}
@@ -376,7 +334,8 @@ int main() {
 			scanf("%s",&buscargm);
 			pos=getPosicao(&listaAlunos,buscargm);
 			if(pos!=-1) {
-				printf("O aluno de RGM %s é o %dº elemento da lista",listaAlunos.dados[pos].RGM,pos+1);
+				printf("O aluno de RGM %s é o %dº elemento da lista\n",listaAlunos.dados[pos].RGM,pos+1);
+				mostraListaEncad(listaAlunos.dados[pos].pt_no);
 			}
 			else {
 				printf("Não existe nenhum aluno cadastrado com esse rgm");
@@ -387,24 +346,31 @@ int main() {
 		
 		else if (op=='3') {
 			printf("\n\n");
-	    	exibirAlunos(listaAlunos);
+	    	exibirAlunos(&listaAlunos);
 	    	getch();
 		}
 		
 		else if(op=='4') {
 			printf("Digite o RGM para remover: ");
 	    	scanf("%s",&(sequencial_cont.RGM));
-	    	removeAluno(&listaAlunos,sequencial_cont.RGM);
+	    	retorno=removeAluno(&listaAlunos,sequencial_cont.RGM);
+	    	if (retorno==1)
+	    	exibirAlunos(&listaAlunos);
+	    	else
+	    	printf("RGM não registrado");
 	    	getch();
 		}
+		
+		else if(op=='5') {
+			system("cls");
+			printf("Créditos: \n--------------\n");
+			printf("Desenvolvedores\n----------------------\n\n");
+			printf("Agiel Gomes\n");
+			printf("Gabriel de Almeida\n");
+			printf("Victor de Almeida\n");
+			getch();
+		}
 	}
-	
-	
-	
-	
-	
-	
-    
 	return 0;
     
 	
