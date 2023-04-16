@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <locale.h>
+#include <windows.h>
 
 #define MAX 60
 
@@ -160,7 +161,6 @@ t_no * criaNo() {
     return no;
 }
 
-
 int encadVazia(cabecalista l) {
     return (l == NULL);
 }
@@ -302,9 +302,22 @@ void exibirAlunos(Lista_aluno lista) {
     }
 }
 
+void menu() {
+	system("cls");
+	printf("Digite a opção desejada:\n1- Incluir um novo elemento na lista\n");
+	printf("2- Buscar algum elemento já existente da lista"); 
+	printf("\n3- Exibir a lista completa \n4- Remover algum elemento da lista\n0- Encerrar o programa\n");
+}
+
 int main() {
 	setlocale(LC_ALL,"Portuguese");
-	int i;
+	int i=0,pos;
+	int qtde=0,totalA=0;
+	char op;
+	char buscargm[9];
+	int sair=0;
+	
+	
 	cabecalista mlista = NULL;
 	
 	t_conteudo sequencial_cont;
@@ -313,30 +326,84 @@ int main() {
 	Lista_aluno listaAlunos = criar();
 	
 	
+	while (sair==0) {
+		menu();
+		
+		do{
+			op = getch();
+		}while (op!='0' && op!='1' && op!='2' && op!='3' && op!='4');
 	
-	printf("Digite o RGM: ");
-	scanf("%s",&(sequencial_cont.RGM));
-	inserirOrdenada(&listaAlunos,sequencial_cont);
+		if (op=='0') {
+			sair=1;
+		}
+		
+		
+		
+		else if (op=='1') {
+			char resp = 's';
+			printf("Digite a quantidade de alunos que serão cadastrados:");
+			scanf("%d",&qtde);
+			totalA+=qtde;
+				for(;i<totalA;i++) {
+					int cont=0;
+					
+					printf("Digite o RGM: ");
+					scanf("%s",&(sequencial_cont.RGM));
+					inserirOrdenada(&listaAlunos,sequencial_cont);
+					do{
+						fflush(stdin);
+						printf("Disciplina:");
+						gets(elemento_encad.disciplina);
+						printf("Nota:");
+						scanf("%f",&elemento_encad.nota);
+				
+						//inserirPos (&myLista, pos, cont);
+						inserirEncad(&listaAlunos.dados[i].pt_no,cont,elemento_encad);
+						cont++;
+						
+						fflush(stdin);
+						printf("Mais disciplinas? s/n\n");
+						resp = getchar();
+						fflush(stdin);
+					}while(resp == 's'); 
+				}
+			getch();
+		}
+		
+		
+		else if (op=='2') {
+			printf("Digite o RGM do aluno que deseja procurar: ");
+			scanf("%s",&buscargm);
+			pos=getPosicao(&listaAlunos,buscargm);
+			if(pos!=-1) {
+				printf("O aluno de RGM %s é o %dº elemento da lista",listaAlunos.dados[pos].RGM,pos+1);
+			}
+			else {
+				printf("Não existe nenhum aluno cadastrado com esse rgm");
+			}
+			
+			getch();
+		}
+		
+		else if (op=='3') {
+			printf("\n\n");
+	    	exibirAlunos(listaAlunos);
+	    	getch();
+		}
+		
+		else if(op=='4') {
+			printf("Digite o RGM para remover: ");
+	    	scanf("%s",&(sequencial_cont.RGM));
+	    	removeAluno(&listaAlunos,sequencial_cont.RGM);
+	    	getch();
+		}
+	}
 	
-	printf("Digite o RGM: ");
-	scanf("%s",&(sequencial_cont.RGM));
-	inserirOrdenada(&listaAlunos,sequencial_cont);
 	
-	printf("O RGM digitado foi: %s \n",sequencial_cont.RGM);
 	
-	mostrar(&listaAlunos);
 	
-	printf("\n\n");
 	
-    exibirAlunos(listaAlunos);
-    
-    printf("Digite o RGM para remover: ");
-    scanf("%s",&(sequencial_cont.RGM));
-    
-    
-    
-    removeAluno(&listaAlunos,sequencial_cont.RGM);
-    exibirAlunos(listaAlunos);
+	
     
 	return 0;
     
